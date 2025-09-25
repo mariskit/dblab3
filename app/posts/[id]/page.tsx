@@ -6,6 +6,41 @@ import Input from "../../../components/ui/Input";
 import Button from "../../../components/ui/Button";
 import Card from "../../../components/ui/Card";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut",
+    },
+  },
+};
+
+const commentVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.4,
+      ease: "easeOut",
+    },
+  },
+};
 
 export default function PostDetail() {
   const [post, setPost] = useState<Post | null>(null);
@@ -153,187 +188,270 @@ export default function PostDetail() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          className="rounded-full h-12 w-12 border-b-2 border-primary-600"
+        />
       </div>
     );
   }
 
   if (!post) {
     return (
-      <div className="text-center py-12">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-center py-12"
+      >
         <h2 className="text-2xl font-bold text-gray-900">Post no encontrado</h2>
         <p className="text-gray-600 mt-2">
           El post que buscas no existe o fue eliminado.
         </p>
-        <Button onClick={() => router.push("/posts")} className="mt-4">
-          Volver a Posts
-        </Button>
-      </div>
+        <motion.div whileHover={{ scale: 1.05 }} className="mt-4">
+          <Button onClick={() => router.push("/posts")}>Volver a Posts</Button>
+        </motion.div>
+      </motion.div>
     );
   }
 
   const canEditPost = currentUser && currentUser.id === post.author_id;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div>
-        <Link href="/posts">
-          <Button variant="secondary" size="sm">
-            ← Volver a Posts
-          </Button>
-        </Link>
-      </div>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="max-w-4xl mx-auto space-y-6"
+    >
+      <motion.div variants={itemVariants}>
+        <motion.div whileHover={{ scale: 1.02 }}>
+          <Link href="/posts">
+            <Button variant="secondary" size="sm">
+              ← Volver a Posts
+            </Button>
+          </Link>
+        </motion.div>
+      </motion.div>
 
-      <Card className="p-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {post.title}
-            </h1>
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
-              <span>Por {post.author_username}</span>
-              <span>•</span>
-              <span>{new Date(post.created_at).toLocaleDateString()}</span>
-              <span className="bg-gray-100 px-2 py-1 rounded-full text-xs">
-                {post.post_type_name}
-              </span>
+      <motion.div variants={itemVariants}>
+        <Card className="p-6 transition-all duration-300 hover:shadow-lg">
+          <div className="flex justify-between items-start mb-4">
+            <div>
+              <motion.h1
+                className="text-3xl font-bold text-gray-900 mb-2"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                {post.title}
+              </motion.h1>
+              <motion.div
+                className="flex items-center space-x-4 text-sm text-gray-600"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.6 }}
+              >
+                <span>Por {post.author_username}</span>
+                <span>•</span>
+                <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                <motion.span
+                  className="bg-gray-100 px-2 py-1 rounded-full text-xs"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  {post.post_type_name}
+                </motion.span>
+              </motion.div>
             </div>
+
+            {canEditPost && (
+              <motion.div
+                className="flex space-x-2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link href={`/posts/edit/${post.id}`}>
+                    <Button variant="secondary" size="sm">
+                      Editar
+                    </Button>
+                  </Link>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button variant="danger" size="sm" onClick={handleDeletePost}>
+                    Eliminar
+                  </Button>
+                </motion.div>
+              </motion.div>
+            )}
           </div>
 
-          {canEditPost && (
-            <div className="flex space-x-2">
-              <Link href={`/posts/edit/${post.id}`}>
-                <Button variant="secondary" size="sm">
-                  Editar
-                </Button>
-              </Link>
-              <Button variant="danger" size="sm" onClick={handleDeletePost}>
-                Eliminar
-              </Button>
-            </div>
-          )}
-        </div>
+          <motion.div
+            className="prose max-w-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.6 }}
+          >
+            <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
+          </motion.div>
+        </Card>
+      </motion.div>
 
-        <div className="prose max-w-none">
-          <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
-        </div>
-      </Card>
+      <motion.div variants={itemVariants}>
+        <Card className="p-6 transition-all duration-300 hover:shadow-lg">
+          <motion.h2
+            className="text-xl font-semibold text-gray-900 mb-4"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            Comentarios ({comments.length})
+          </motion.h2>
 
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Comentarios ({comments.length})
-        </h2>
-
-        {/* Formulario de comentario */}
-        {currentUser && (
-          <form onSubmit={handleAddComment} className="mb-6">
-            <div className="mb-2">
-              <label
-                htmlFor="comment"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Añadir comentario
-              </label>
-              <textarea
-                id="comment"
-                value={newComment}
-                onChange={(e) => setNewComment(e.target.value)}
-                placeholder="Escribe tu comentario..."
-                rows={3}
-                className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                required
-              />
-            </div>
-            <Button type="submit" disabled={commentLoading}>
-              {commentLoading ? "Publicando..." : "Publicar Comentario"}
-            </Button>
-          </form>
-        )}
-
-        {/* Lista de comentarios */}
-        <div className="space-y-4">
-          {comments.map((comment) => (
-            <div
-              key={comment.id}
-              className="border-b border-gray-200 pb-4 last:border-0"
+          {/* Formulario de comentario */}
+          {currentUser && (
+            <motion.form
+              onSubmit={handleAddComment}
+              className="mb-6"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
             >
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <span className="font-medium text-gray-900">
-                    {comment.author_username}
-                  </span>
-                  <span className="text-gray-500 text-sm ml-2">
-                    {new Date(comment.created_at).toLocaleDateString()}
-                    {comment.updated_at && " (editado)"}
-                  </span>
-                </div>
+              <div className="mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Añadir comentario
+                </label>
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Escribe tu comentario..."
+                  rows={3}
+                  className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 transition-colors duration-200"
+                  required
+                />
+              </div>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <Button type="submit" disabled={commentLoading}>
+                  {commentLoading ? "Publicando..." : "Publicar Comentario"}
+                </Button>
+              </motion.div>
+            </motion.form>
+          )}
 
-                {currentUser && currentUser.id === comment.author_id && (
-                  <div className="flex space-x-2">
-                    {editingComment?.id === comment.id ? (
-                      <>
-                        <button
-                          onClick={() => handleUpdateComment(comment.id)}
-                          className="text-green-600 hover:text-green-800 text-sm font-medium"
-                          disabled={commentLoading}
-                        >
-                          Guardar
-                        </button>
-                        <button
-                          onClick={() => setEditingComment(null)}
-                          className="text-gray-600 hover:text-gray-800 text-sm font-medium"
-                          disabled={commentLoading}
-                        >
-                          Cancelar
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <button
-                          onClick={() => handleEditComment(comment)}
-                          className="text-black hover:text-primary-800 text-sm font-medium"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => handleDeleteComment(comment.id)}
-                          className="text-red-600 hover:text-red-800 text-sm font-medium"
-                        >
-                          Eliminar
-                        </button>
-                      </>
+          {/* Lista de comentarios */}
+          <AnimatePresence>
+            <div className="space-y-4">
+              {comments.map((comment, index) => (
+                <motion.div
+                  key={comment.id}
+                  variants={commentVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="border-b border-gray-200 pb-4 last:border-0"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <span className="font-medium text-gray-900">
+                        {comment.author_username}
+                      </span>
+                      <span className="text-gray-500 text-sm ml-2">
+                        {new Date(comment.created_at).toLocaleDateString()}
+                        {comment.updated_at && " (editado)"}
+                      </span>
+                    </div>
+
+                    {currentUser && currentUser.id === comment.author_id && (
+                      <div className="flex space-x-2">
+                        {editingComment?.id === comment.id ? (
+                          <>
+                            <motion.button
+                              onClick={() => handleUpdateComment(comment.id)}
+                              className="text-green-600 hover:text-green-800 text-sm font-medium"
+                              disabled={commentLoading}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              Guardar
+                            </motion.button>
+                            <motion.button
+                              onClick={() => setEditingComment(null)}
+                              className="text-gray-600 hover:text-gray-800 text-sm font-medium"
+                              disabled={commentLoading}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              Cancelar
+                            </motion.button>
+                          </>
+                        ) : (
+                          <>
+                            <motion.button
+                              onClick={() => handleEditComment(comment)}
+                              className="text-primary-600 hover:text-primary-800 text-sm font-medium"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              Editar
+                            </motion.button>
+                            <motion.button
+                              onClick={() => handleDeleteComment(comment.id)}
+                              className="text-red-600 hover:text-red-800 text-sm font-medium"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                            >
+                              Eliminar
+                            </motion.button>
+                          </>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
-              </div>
 
-              {editingComment?.id === comment.id ? (
-                <textarea
-                  value={editingComment.content}
-                  onChange={(e) =>
-                    setEditingComment({
-                      ...editingComment,
-                      content: e.target.value,
-                    })
-                  }
-                  rows={3}
-                  className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                />
-              ) : (
-                <p className="text-gray-700 whitespace-pre-wrap">
-                  {comment.content}
-                </p>
+                  {editingComment?.id === comment.id ? (
+                    <textarea
+                      value={editingComment.content}
+                      onChange={(e) =>
+                        setEditingComment({
+                          ...editingComment,
+                          content: e.target.value,
+                        })
+                      }
+                      rows={3}
+                      className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+                    />
+                  ) : (
+                    <p className="text-gray-700 whitespace-pre-wrap">
+                      {comment.content}
+                    </p>
+                  )}
+                </motion.div>
+              ))}
+
+              {comments.length === 0 && (
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-gray-500 text-center py-4"
+                >
+                  No hay comentarios aún. Sé el primero en comentar.
+                </motion.p>
               )}
             </div>
-          ))}
-
-          {comments.length === 0 && (
-            <p className="text-gray-500 text-center py-4">
-              No hay comentarios aún. Sé el primero en comentar.
-            </p>
-          )}
-        </div>
-      </Card>
-    </div>
+          </AnimatePresence>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 }

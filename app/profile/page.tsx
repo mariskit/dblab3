@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
 import Card from "../../components/ui/Card";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProfilePage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -117,117 +118,202 @@ export default function ProfilePage() {
     }
   };
 
+  const cardVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
   if (!currentUser) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex justify-center items-center h-64"
+      >
+        <motion.div
+          animate={{
+            scale: [1, 1.1, 1],
+            opacity: [0.7, 1, 0.7],
+          }}
+          transition={{
+            duration: 1.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="rounded-full h-12 w-12 border-b-2 border-primary-600"
+        />
+      </motion.div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <div className="text-center">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="max-w-2xl mx-auto space-y-6"
+    >
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        className="text-center"
+      >
         <h1 className="text-3xl font-bold text-gray-900">Mi Perfil</h1>
         <p className="text-gray-600 mt-2">Gestiona tu cuenta y configuración</p>
-      </div>
+      </motion.div>
 
       {/* Información del usuario */}
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Información de la cuenta
-        </h2>
-        <div className="space-y-3">
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="font-medium text-gray-700">Usuario:</span>
-            <span className="text-gray-900">{currentUser.username}</span>
+      <motion.div variants={cardVariants} initial="hidden" animate="visible">
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Información de la cuenta
+          </h2>
+          <div className="space-y-3">
+            {[
+              { label: "Usuario:", value: currentUser.username },
+              { label: "ID:", value: currentUser.id },
+              {
+                label: "Miembro desde:",
+                value: new Date(currentUser.created_at).toLocaleDateString(),
+              },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="flex justify-between items-center py-2 border-b border-gray-100"
+              >
+                <span className="font-medium text-gray-700">{item.label}</span>
+                <span className="text-gray-900">{item.value}</span>
+              </motion.div>
+            ))}
           </div>
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="font-medium text-gray-700">ID:</span>
-            <span className="text-gray-900">{currentUser.id}</span>
-          </div>
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
-            <span className="font-medium text-gray-700">Miembro desde:</span>
-            <span className="text-gray-900">
-              {new Date(currentUser.created_at).toLocaleDateString()}
-            </span>
-          </div>
-        </div>
-      </Card>
+        </Card>
+      </motion.div>
 
       {/* Cambiar contraseña */}
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Cambiar Contraseña
-        </h2>
+      <motion.div
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.1 }}
+      >
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Cambiar Contraseña
+          </h2>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mb-4">
-            {error}
-          </div>
-        )}
+          <AnimatePresence>
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm mb-4"
+              >
+                {error}
+              </motion.div>
+            )}
 
-        {success && (
-          <div className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md text-sm mb-4">
-            {success}
-          </div>
-        )}
+            {success && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                className="bg-green-50 border border-green-200 text-green-600 px-4 py-3 rounded-md text-sm mb-4"
+              >
+                {success}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-        <form onSubmit={handlePasswordChange} className="space-y-4">
-          <Input
-            label="Contraseña Actual *"
-            name="currentPassword"
-            type="password"
-            required
-            placeholder="Ingresa tu contraseña actual"
-            value={formData.currentPassword}
-            onChange={handleChange}
-          />
+          <form onSubmit={handlePasswordChange} className="space-y-4">
+            {["currentPassword", "newPassword", "confirmPassword"].map(
+              (field, index) => (
+                <motion.div
+                  key={field}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + index * 0.1 }}
+                  whileHover={{ scale: 1.01 }}
+                >
+                  <Input
+                    label={
+                      field === "currentPassword"
+                        ? "Contraseña Actual *"
+                        : field === "newPassword"
+                        ? "Nueva Contraseña *"
+                        : "Confirmar Nueva Contraseña *"
+                    }
+                    name={field}
+                    type="password"
+                    required
+                    placeholder={
+                      field === "currentPassword"
+                        ? "Ingresa tu contraseña actual"
+                        : field === "newPassword"
+                        ? "Ingresa tu nueva contraseña"
+                        : "Confirma tu nueva contraseña"
+                    }
+                    value={formData[field as keyof typeof formData]}
+                    onChange={handleChange}
+                  />
+                </motion.div>
+              )
+            )}
 
-          <Input
-            label="Nueva Contraseña *"
-            name="newPassword"
-            type="password"
-            required
-            placeholder="Ingresa tu nueva contraseña"
-            value={formData.newPassword}
-            onChange={handleChange}
-          />
-
-          <Input
-            label="Confirmar Nueva Contraseña *"
-            name="confirmPassword"
-            type="password"
-            required
-            placeholder="Confirma tu nueva contraseña"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-          />
-
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? "Cambiando contraseña..." : "Cambiar Contraseña"}
-          </Button>
-        </form>
-      </Card>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? "Cambiando contraseña..." : "Cambiar Contraseña"}
+              </Button>
+            </motion.div>
+          </form>
+        </Card>
+      </motion.div>
 
       {/* Eliminar cuenta */}
-      <Card className="p-6 border-red-200 bg-red-50">
-        <h2 className="text-xl font-semibold text-red-900 mb-2">
-          Zona Peligrosa
-        </h2>
-        <p className="text-red-700 mb-4">
-          Eliminar tu cuenta es una acción permanente. Se eliminarán todos tus
-          posts, comentarios y datos asociados.
-        </p>
+      <motion.div
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.2 }}
+        whileHover={{ y: -2 }}
+      >
+        <Card className="p-6 border-red-200 bg-red-50">
+          <h2 className="text-xl font-semibold text-red-900 mb-2">
+            Zona Peligrosa
+          </h2>
+          <p className="text-red-700 mb-4">
+            Eliminar tu cuenta es una acción permanente. Se eliminarán todos tus
+            posts, comentarios y datos asociados.
+          </p>
 
-        <Button
-          variant="danger"
-          onClick={handleDeleteAccount}
-          className="w-full"
-        >
-          Eliminar Mi Cuenta
-        </Button>
-      </Card>
-    </div>
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <Button
+              variant="danger"
+              onClick={handleDeleteAccount}
+              className="w-full"
+            >
+              Eliminar Mi Cuenta
+            </Button>
+          </motion.div>
+        </Card>
+      </motion.div>
+    </motion.div>
   );
 }
