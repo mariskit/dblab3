@@ -1,9 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Input from "../../components/ui/Input";
 import Button from "../../components/ui/Button";
-import Card from "../../components/ui/Card"
+import Card from "../../components/ui/Card";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -12,7 +12,17 @@ export default function Login() {
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
   const router = useRouter();
+
+  // Verificar si ya está autenticado
+  useEffect(() => {
+    const userData = localStorage.getItem("currentUser");
+    if (userData) {
+      router.push("/posts");
+    }
+    setAuthChecked(true);
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -38,8 +48,11 @@ export default function Login() {
       const data = await response.json();
 
       if (response.ok) {
+        // Guardar usuario en localStorage
         localStorage.setItem("currentUser", JSON.stringify(data.user));
-        router.push("/posts");
+
+        // Forzar recarga de la página para asegurar que los datos se carguen correctamente
+        window.location.href = "/posts";
       } else {
         setError(data.error || "Error al iniciar sesión");
       }
@@ -49,6 +62,15 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  // Mostrar loading mientras se verifica la autenticación
+  if (!authChecked) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
