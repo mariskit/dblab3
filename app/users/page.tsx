@@ -142,11 +142,11 @@ export default function UsersPage() {
                   className="flex justify-between items-center pt-3 border-t border-gray-100"
                   whileHover={{ scale: 1.02 }}
                 >
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-black">
                     Posts publicados:
                   </span>
                   <motion.span
-                    className="bg-primary-100 text-primary-800 px-2 py-1 rounded-full text-sm font-medium"
+                    className="bg-primary-100 text-black px-2 py-1 rounded-full text-sm font-medium"
                     whileHover={{ scale: 1.1 }}
                     transition={{ type: "spring", stiffness: 400 }}
                   >

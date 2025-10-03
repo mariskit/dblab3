@@ -183,7 +183,7 @@ export default function Register() {
               <motion.div variants={itemVariants} className="text-center">
                 <motion.a
                   href="/login"
-                  className="text-primary-600 hover:text-primary-500 text-sm font-medium"
+                  className="text-black hover:text-primary-500 text-sm font-medium"
                   whileHover={{ x: 2 }}
                 >
                   ¿Ya tienes cuenta? Inicia sesión

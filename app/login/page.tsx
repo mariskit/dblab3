@@ -200,7 +200,7 @@ export default function Login() {
               >
                 <motion.a
                   href="/register"
-                  className="text-primary-600 hover:text-primary-800 text-sm font-medium transition-colors duration-200"
+                  className="text-black hover:text-primary-800 text-sm font-medium transition-colors duration-200"
                   whileHover={{ scale: 1.05 }}
                 >
                   ¿No tienes cuenta? Regístrate

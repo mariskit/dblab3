@@ -102,7 +102,7 @@ export default function CreatePost() {
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Crear Nuevo Post</h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-black mt-2">
           Comparte tus ideas con la comunidad
         </p>
       </div>
@@ -153,7 +153,7 @@ export default function CreatePost() {
           <div>
             <label
               htmlFor="content"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-black  mb-1"
             >
               Contenido *
             </label>
@@ -165,7 +165,7 @@ export default function CreatePost() {
               placeholder="Escribe el contenido de tu post aquí..."
               value={formData.content}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 resize-vertical"
+              className="text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 resize-vertical"
             />
           </div>
 

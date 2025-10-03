@@ -19,7 +19,7 @@ export default function Input({
         </label>
       )}
       <input
-        className={`w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
+        className={`text-black w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 ${
           error ? "border-red-500" : ""
         } ${className}`}
         {...props}
